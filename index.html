@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#142e37">
+<meta name="application-name" content="HTML to Rich">
+<meta name="description" content="Paste supported semantic HTML, preview the formatting, and copy rich text. A simple converter that processes your content in your browser.">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none'">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" type="image/svg+xml" href="/icon.svg">
+<link rel="stylesheet" href="/app.css">
+<title>HTML to Rich</title>
+<script src="/app.js" defer></script>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to converter</a>
+<main id="main" tabindex="-1">
+<header class="mast">
+  <img class="logo" src="/icon.svg" width="48" height="48" alt="">
+  <div>
+    <div class="eyebrow">HTML → RICH TEXT</div>
+    <h1>HTML to Rich</h1>
+    <p class="subhead">Paste HTML. Preview it. Copy formatted text.</p>
+  </div>
+</header>
+<p class="release-note"><span>Pre-release</span> Android-to-Telegram verification is pending.</p>
+<section class="step" aria-labelledby="paste-title">
+  <span class="number" aria-hidden="true">1</span>
+  <div class="step-body">
+    <h2 id="paste-title">Paste HTML</h2>
+    <p>Start with an HTML fragment with complete tags.</p>
+    <button id="paste" class="primary-wide" type="button">Paste HTML</button>
+    <details class="source-panel">
+      <summary>Paste manually or edit HTML</summary>
+      <label for="source">HTML source</label>
+      <textarea id="source" rows="6" spellcheck="false" autocapitalize="off" autocomplete="off" aria-describedby="source-help"></textarea>
+      <p id="source-help">Paste into this field if clipboard access is unavailable.</p>
+    </details>
+  </div>
+</section>
+<section class="step" aria-labelledby="preview-title">
+  <span class="number" aria-hidden="true">2</span>
+  <div class="step-body">
+    <h2 id="preview-title">Preview</h2>
+    <p>Check the formatting and link destinations.</p>
+    <section id="preview" aria-label="Formatted content preview" tabindex="0"></section>
+  </div>
+</section>
+<section class="step" aria-labelledby="copy-title">
+  <span class="number" aria-hidden="true">3</span>
+  <div class="step-body">
+    <h2 id="copy-title">Copy Rich Text</h2>
+    <p>Paste into your destination app and check the result.</p>
+    <button id="copy" class="primary-wide" type="button">Copy Rich Text</button>
+    <p id="status" role="status" aria-live="polite" aria-atomic="true">Paste an HTML fragment to begin.</p>
+    <details class="help">
+      <summary>Clipboard not working?</summary>
+      <p>Use “Paste manually or edit HTML” to enter your source. If rich copying is blocked, choose “Select preview” and copy the selected content with your device's Copy action.</p>
+      <button id="select" class="outlined" type="button">Select preview</button>
+    </details>
+  </div>
+</section>
+<footer>
+  <p>Your HTML is processed locally in this browser. It is not uploaded.</p>
+  <p>GitHub hosts the website and may log ordinary page and file requests. Destination apps preserve different formatting.</p>
+</footer>
+</main>
+</body>
+</html>
