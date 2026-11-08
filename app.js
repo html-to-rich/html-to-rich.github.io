@@ -6,6 +6,36 @@ const status=document.getElementById('status');
 const allow=new Set(['H1','H2','H3','H4','H5','H6','P','DIV','SPAN','BR','STRONG','B','EM','I','U','MARK','S','DEL','SUP','SUB','UL','OL','LI','BLOCKQUOTE','TABLE','THEAD','TBODY','TFOOT','TR','TH','TD','DETAILS','SUMMARY','PRE','CODE','A','HR']);
 const skip=new Set(['SCRIPT','STYLE','IFRAME','OBJECT','EMBED','FORM','INPUT','BUTTON','SVG','MATH','TEMPLATE','META','LINK','BASE','VIDEO','AUDIO','IMG']);
 function updateStatus(message,kind='') {status.className=kind;status.textContent=message;}
+// Only user-activated navigation; never execute or fetch an input link here.
+function safeHref(raw){
+ if(/[\u0000-\u001f\u007f]/.test(raw))return null;
+ const href=raw.trim();
+ if(!href)return null;
+ let decoded,u;
+ try{decoded=decodeURIComponent(href);u=new URL(href);}catch{return null;}
+ if(/[\u0000-\u001f\u007f]/.test(decoded))return null;
+ if(['https:','http:'].includes(u.protocol))return u.href;
+ if(u.protocol==='mailto:'){
+  const address=decodeURIComponent(u.pathname);
+  // A deliberately bounded mailto profile: one unquoted ASCII address.
+  if(!/^[A-Za-z0-9.!#$%&'*+\/=?^_`{|}~-]+@[A-Za-z0-9](?:[A-Za-z0-9.-]*[A-Za-z0-9])?$/.test(address)||u.hash)return null;
+  if(address.startsWith('.')||address.includes('..')||address.split('@')[0].endsWith('.'))return null;
+  const seen=new Set();
+  for(const [key] of u.searchParams){
+   const name=key.toLowerCase();
+   if(!['subject','body'].includes(name)||seen.has(name))return null;
+   seen.add(name);
+  }
+  return u.href;
+ }
+ if(u.protocol==='tel:'){
+  const number=u.pathname;
+  // Global numbers, visual separators and one numeric extension only.
+  if(u.search||u.hash||!/^\+[0-9().-]+(?:;ext=[0-9]+)?$/i.test(number)||!/[0-9]/.test(number.split(';')[0]))return null;
+  return u.href;
+ }
+ return null;
+}
 function clean(node){
  if(node.nodeType===Node.TEXT_NODE) return document.createTextNode(node.nodeValue);
  if(node.nodeType!==Node.ELEMENT_NODE) return document.createDocumentFragment();
@@ -17,13 +47,19 @@ function clean(node){
   return frag;
  }
  const el=document.createElement(tag.toLowerCase());
+ const dir=(node.getAttribute('dir')||'').toLowerCase();
+ if(['ltr','rtl','auto'].includes(dir))el.setAttribute('dir',dir);
+ const lang=node.getAttribute('lang')||'';
+ if(/^(?:[A-Za-z]{2,8}(?:-[A-Za-z0-9]{1,8})*|[xi](?:-[A-Za-z0-9]{1,8})+)$/i.test(lang))el.setAttribute('lang',lang);
  if(tag==='A'){
   const href=node.getAttribute('href');
-  if(href){try{const u=new URL(href);if(['https:','http:'].includes(u.protocol)){el.setAttribute('href',u.href);el.setAttribute('rel','noopener noreferrer');el.setAttribute('target','_blank');}}catch{}}
+  const safe=href?safeHref(href):null;
+  if(safe){el.setAttribute('href',safe);el.setAttribute('rel','noopener noreferrer');el.setAttribute('target','_blank');}
  }
  if(tag==='DETAILS'&&node.hasAttribute('open'))el.setAttribute('open','');
  if(tag==='OL'&&node.hasAttribute('start')){
-  const n=Number(node.getAttribute('start'));if(Number.isInteger(n)&&n>=1&&n<=999)el.setAttribute('start',String(n));
+  const value=node.getAttribute('start').trim();
+  const n=Number(value);if(/^[+-]?\d+$/.test(value)&&Number.isSafeInteger(n))el.setAttribute('start',String(n));
  }
  if(['TH','TD'].includes(tag)){
   for(const attr of ['colspan','rowspan']){const n=Number(node.getAttribute(attr));if(Number.isInteger(n)&&n>=1&&n<=6)el.setAttribute(attr,String(n));}
@@ -74,7 +110,7 @@ function render(){
  if(parsed.error){updateStatus(parsed.error,'warn');return false;}
  const text=parsed.html;
  if(!text){const p=document.createElement('p');p.className='empty';p.textContent='Your formatted content will appear here.';preview.appendChild(p);updateStatus('Paste an HTML fragment to begin.');return false;}
- if(!/<(?:h[1-6]|p|strong|em|u|mark|ul|ol|li|blockquote|table|details|pre|a|div|span)\b/i.test(text)){
+ if(![...text.matchAll(/<([a-z][\w:-]*)\b/gi)].some(match=>allow.has(match[1].toUpperCase()))){
   updateStatus('This does not look like supported HTML. Paste an HTML fragment with complete tags.','warn');return false;
  }
  if(!completeFragment(text)){updateStatus('Incomplete or mismatched HTML. Paste the complete HTML fragment.','warn');return false;}
@@ -87,20 +123,60 @@ function render(){
  updateStatus(parsed.unwrapped?'Code fences removed. Check the preview, then copy.':'Preview ready. Check the formatting, then choose Copy Rich Text.');return true;
 }
 function selectPreview(){const selection=window.getSelection();const range=document.createRange();range.selectNodeContents(preview);selection.removeAllRanges();selection.addRange(range);}
-function plainNode(node,depth=0){
- if(node.nodeType===Node.TEXT_NODE)return node.nodeValue;
- if(node.nodeType!==Node.ELEMENT_NODE)return '';
- const tag=node.tagName;
- const text=[...node.childNodes].map(c=>plainNode(c,depth+(tag==='LI'?1:0))).join('');
- if(tag==='BR')return '\n';
- if(tag==='HR')return '\n---\n';
- if(tag==='LI')return '\n'+'  '.repeat(Math.min(depth,4))+'• '+text.trim();
- if(['H1','H2','H3','H4','H5','H6','P','BLOCKQUOTE','DIV','PRE','TABLE','DETAILS','SUMMARY'].includes(tag))return '\n'+text.trim()+'\n';
- if(tag==='TR')return '\n'+text.replace(/\s*\|\s*$/,'')+'\n';
- if(['TH','TD'].includes(tag))return text.trim()+' | ';
+function plainText(){
+ // Protect literal code before normalizing prose and generated block spacing.
+ // Choose a marker absent from both visible text and sanitized attributes.
+ let prefix='\uE000HTMLTORICH';
+ const occupied=preview.textContent+preview.innerHTML;
+ while(occupied.includes(prefix))prefix+='_';
+ const literal=[];
+ const token=i=>prefix+i+'\uE001';
+ const protect=text=>{const i=literal.push(text)-1;return token(i);};
+ const blankEdges=text=>text.replace(/^[ \t]*\n(?:[ \t]*\n)*/,'').replace(/(?:\n[ \t]*)+$/,'');
+ function item(li,depth,marker){
+  let body=blankEdges([...li.childNodes].map(child=>walk(child,depth+1)).join('')).replace(/\n{2,}/g,'\n');
+  const lines=body.split('\n');
+  const indent='  '.repeat(depth),childIndent='  '.repeat(depth+1);
+  const continuation=indent+' '.repeat(marker.length);
+  const startsWithChild=lines[0].startsWith(childIndent);
+  let first=startsWithChild?indent+marker.trimEnd()+'\n'+lines[0]:indent+marker+lines[0].trimStart();
+  for(const line of lines.slice(1))first+='\n'+(line.startsWith(childIndent)?line:continuation+line);
+  return first;
+ }
+ function walk(node,depth=0){
+  if(node.nodeType===Node.TEXT_NODE)return node.nodeValue.replace(/[ \t\r\n\f]+/g,' ');
+  if(node.nodeType!==Node.ELEMENT_NODE)return '';
+  const tag=node.tagName;
+  if(tag==='PRE')return '\n\n'+protect(node.textContent)+'\n\n';
+  if(tag==='CODE')return protect(node.textContent);
+  if(tag==='BR')return '\n';
+  if(tag==='HR')return '\n\n---\n\n';
+  if(tag==='UL'||tag==='OL'){
+   let count=tag==='OL'&&node.hasAttribute('start')?BigInt(node.getAttribute('start')):1n;
+   const entries=[];
+   for(const child of [...node.childNodes]){
+    if(child.nodeType===Node.ELEMENT_NODE&&child.tagName==='LI')entries.push(item(child,depth,tag==='OL'?(count++)+'. ':'• '));
+    else if(child.textContent.trim())entries.push(walk(child,depth));
+   }
+   return '\n'+entries.join('\n')+'\n';
+  }
+  if(tag==='LI')return '\n'+item(node,depth,'• ')+'\n';
+  if(tag==='TR'){
+   const cells=[...node.children].filter(child=>['TH','TD'].includes(child.tagName));
+   return cells.map(cell=>blankEdges(walk(cell,depth)).trim()).join(' | ')+'\n';
+  }
+  const text=[...node.childNodes].map(child=>walk(child,depth)).join('');
+  if(tag==='A'){
+   const href=node.getAttribute('href');
+   return href&&node.textContent.trim()!==href?text+' ('+href+')':text;
+  }
+  if(['H1','H2','H3','H4','H5','H6','P','BLOCKQUOTE','DIV','TABLE','DETAILS','SUMMARY'].includes(tag))return '\n\n'+blankEdges(text).trim()+'\n\n';
+  return text;
+ }
+ let text=walk(preview).replace(/[ \t]+\n/g,'\n').replace(/\n{3,}/g,'\n\n').trim();
+ for(let i=0;i<literal.length;i++)text=text.split(token(i)).join(literal[i]);
  return text;
 }
-function plainText(){return plainNode(preview).replace(/\n[ \t]+/g,'\n').replace(/\n{3,}/g,'\n\n').trim();}
 async function writePlain(text){await navigator.clipboard.writeText(text);}
 document.getElementById('paste').addEventListener('click',async()=>{
  try{
@@ -135,3 +211,4 @@ document.getElementById('copy').addEventListener('click',async()=>{
 if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch(()=>{});
 render();
 })();
+
