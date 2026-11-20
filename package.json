@@ -1,0 +1,16 @@
+{
+  "name": "html-to-rich-converter",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@11.25.0",
+  "scripts": {
+    "build": "node src/build.mjs",
+    "test": "node --test test/profile.test.mjs"
+  },
+  "dependencies": {
+    "parse5": "8.1.1"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2"
+  }
+}

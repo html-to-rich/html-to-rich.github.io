@@ -1,6 +1,6 @@
 const PREFIX = 'html-to-rich-';
-const CACHE = PREFIX + 'v4-terms';
-const APP = ['/', '/index.html', '/app.css', '/app.js', '/manifest.webmanifest', '/icon.png'];
+const CACHE = PREFIX + 'v5-shared-profile';
+const APP = ['/', '/index.html', '/app.css', '/app.js', '/converter-core.mjs', '/manifest.webmanifest', '/icon.png'];
 
 self.addEventListener('install', event => {
   event.waitUntil((async () => {

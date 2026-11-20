@@ -13,7 +13,8 @@
   <link rel="apple-touch-icon" href="/icon.png">
   <link rel="stylesheet" href="/app.css">
   <title>Telegram Rich Text by steffko · HTML to Rich</title>
-  <script src="/app.js" defer></script>
+  <meta http-equiv="x-dns-prefetch-control" content="off">
+  <script type="module" src="/app.js"></script>
 </head>
 <body>
   <a class="skip-link" href="#converter">Skip to converter</a>
@@ -79,8 +80,9 @@
       </section>
       <section id="privacy" class="privacy" aria-labelledby="privacy-title" tabindex="-1">
         <h2 id="privacy-title">Privacy</h2>
-        <p><strong>In ChatGPT.</strong> OpenAI processes your conversation according to your account settings. The plugin has no publisher-operated server that receives your drafts. You decide what to copy to Telegram. <a href="https://openai.com/policies/privacy-policy/">OpenAI privacy policy</a></p>
-        <p><strong>In the converter.</strong> Your pasted HTML stays in this tab’s memory. The converter has no accounts, analytics or draft uploads. Clearing the source clears the preview. Your browser and device manage any clipboard copies.</p>
+        <p><strong>In ChatGPT.</strong> OpenAI processes your conversation according to your account settings. When the plugin checks a rich draft, it sends the authored HTML fragment to a service operated by steffko. The service checks its formatting and returns prepared HTML, plain text and diagnostics. A plain-text request can be answered without this call. You decide what to copy to Telegram. <a href="https://openai.com/policies/privacy-policy/">OpenAI privacy policy</a></p>
+        <p><strong>Validation service.</strong> The service processes the fragment in memory for the request. It does not save or cache drafts and responses, log their contents, or send them to analytics. Request logging is disabled for the validation route. The host may record operational events such as service starts and network errors. System logs rotate according to available journal space, without a fixed retention period. The validator does not open links, receive Telegram credentials or send messages.</p>
+        <p><strong>In the browser converter.</strong> Your pasted HTML stays in this tab’s memory. The converter has no accounts, analytics or draft uploads. Clearing the source clears the preview. Your browser and device manage any clipboard copies.</p>
         <p><strong>Website hosting.</strong> GitHub Pages serves the site’s files and logs visitors’ IP addresses for security. The offline cache holds site files. It does not store your drafts. <a href="https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages#data-collection">GitHub Pages data collection</a></p>
         <p><strong>Support email.</strong> Google processes support emails through Gmail. To respond, steffko uses your email address, message and any attachments you choose to send. Once your request is resolved, steffko deletes the support email thread. For privacy questions or deletion requests, <a href="mailto:telegram.rich.text@gmail.com">email steffko</a>. <a href="https://policies.google.com/privacy">Google privacy policy</a></p>
       </section>
