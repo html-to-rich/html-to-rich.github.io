@@ -1,71 +1,89 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#142e37">
-<meta name="application-name" content="HTML to Rich">
-<meta name="description" content="Paste supported semantic HTML, preview the formatting, and copy rich text. A simple converter that processes your content in your browser.">
-<meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none'">
-<link rel="manifest" href="/manifest.webmanifest">
-<link rel="icon" type="image/svg+xml" href="/icon.svg">
-<link rel="stylesheet" href="/app.css">
-<title>HTML to Rich</title>
-<script src="/app.js" defer></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#3d002e">
+  <meta name="application-name" content="Telegram Rich Text">
+  <meta name="description" content="The home of Telegram Rich Text by steffko. Draft formatted Telegram messages in ChatGPT or use HTML to Rich to preview and copy your HTML in the browser.">
+  <meta name="referrer" content="no-referrer">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none'">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" type="image/png" href="/icon.png">
+  <link rel="apple-touch-icon" href="/icon.png">
+  <link rel="stylesheet" href="/app.css">
+  <title>Telegram Rich Text by steffko · HTML to Rich</title>
+  <script src="/app.js" defer></script>
 </head>
 <body>
-<a class="skip-link" href="#main">Skip to converter</a>
-<main id="main" tabindex="-1">
-<header class="mast">
-  <img class="logo" src="/icon.svg" width="48" height="48" alt="">
-  <div>
-    <div class="eyebrow">HTML → RICH TEXT</div>
-    <h1>HTML to Rich</h1>
-    <p class="subhead">Paste HTML. Preview it. Copy formatted text.</p>
-  </div>
-</header>
-<p class="release-note"><span>Pre-release</span> Android-to-Telegram verification is pending.</p>
-<section class="step" aria-labelledby="paste-title">
-  <span class="number" aria-hidden="true">1</span>
-  <div class="step-body">
-    <h2 id="paste-title">Paste HTML</h2>
-    <p>Start with an HTML fragment with complete tags.</p>
-    <button id="paste" class="primary-wide" type="button">Paste HTML</button>
-    <details class="source-panel">
-      <summary>Paste manually or edit HTML</summary>
-      <label for="source">HTML source</label>
-      <textarea id="source" rows="6" spellcheck="false" autocapitalize="off" autocomplete="off" aria-describedby="source-help"></textarea>
-      <p id="source-help">Paste into this field if clipboard access is unavailable.</p>
-    </details>
-  </div>
-</section>
-<section class="step" aria-labelledby="preview-title">
-  <span class="number" aria-hidden="true">2</span>
-  <div class="step-body">
-    <h2 id="preview-title">Preview</h2>
-    <p>Check the formatting and link destinations.</p>
-    <section id="preview" aria-label="Formatted content preview" tabindex="0"></section>
-  </div>
-</section>
-<section class="step" aria-labelledby="copy-title">
-  <span class="number" aria-hidden="true">3</span>
-  <div class="step-body">
-    <h2 id="copy-title">Copy Rich Text</h2>
-    <p>Paste into your destination app and check the result.</p>
-    <button id="copy" class="primary-wide" type="button">Copy Rich Text</button>
-    <p id="status" role="status" aria-live="polite" aria-atomic="true">Paste an HTML fragment to begin.</p>
-    <details class="help">
-      <summary>Clipboard not working?</summary>
-      <p>Use “Paste manually or edit HTML” to enter your source. If rich copying is blocked, choose “Select preview” and copy the selected content with your device's Copy action.</p>
-      <button id="select" class="outlined" type="button">Select preview</button>
-    </details>
-  </div>
-</section>
-<footer>
-  <p>Your HTML is processed locally in this browser. It is not uploaded.</p>
-  <p>GitHub hosts the website and may log ordinary page and file requests. Destination apps preserve different formatting.</p>
-</footer>
-</main>
+  <a class="skip-link" href="#converter">Skip to converter</a>
+  <header class="site-header">
+    <div class="wrap mast">
+      <a class="brand" href="#main" aria-label="Telegram Rich Text by steffko, home">
+        <img src="/icon.png" width="40" height="40" alt=""><span>steffko</span>
+      </a>
+      <nav aria-label="Page sections">
+        <a href="#converter">Converter</a>
+        <a href="#support">Support</a>
+        <a href="#privacy">Privacy</a>
+      </nav>
+    </div>
+  </header>
+  <main id="main" class="wrap" tabindex="-1">
+    <div class="workspace">
+      <section class="intro" aria-labelledby="product-title">
+        <h1 id="product-title">Telegram <br>Rich Text</h1>
+        <p class="lead">Turn notes into Telegram messages with headings, lists and links that are easy to read.</p>
+        <p class="byline">A free, independent ChatGPT plugin by <strong>steffko</strong>. Unaffiliated with Telegram.</p>
+      </section>
+      <section id="converter" class="converter" aria-labelledby="converter-title" tabindex="-1">
+        <div class="converter-head">
+          <h2 id="converter-title">HTML to Rich</h2>
+          <p>Preview your HTML and copy the formatted message.</p>
+        </div>
+        <div class="converter-body">
+          <div class="paste-row">
+            <button id="paste" type="button">Paste HTML</button>
+          </div>
+          <details class="source-panel">
+            <summary>Paste manually or edit HTML</summary>
+            <label for="source">HTML source</label>
+            <textarea id="source" rows="5" spellcheck="false" autocapitalize="off" autocomplete="off" aria-describedby="source-help"></textarea>
+            <p id="source-help">Paste the complete fragment from your code block here.</p>
+          </details>
+          <h3 class="preview-label" id="preview-label">Preview</h3>
+          <section id="preview" aria-labelledby="preview-label" tabindex="0"></section>
+          <button id="copy" type="button">Copy Rich Text</button>
+          <p id="status" role="status" aria-live="polite" aria-atomic="true">Paste an HTML fragment to begin.</p>
+          <details class="help">
+            <summary>Clipboard help</summary>
+            <p>If automatic paste is blocked, open the manual field above. If copying is blocked, choose <strong>Select preview</strong> and use your device’s Copy action. Paste into Telegram and check the result before sending.</p>
+            <button id="select" class="outlined" type="button">Select preview</button>
+          </details>
+        </div>
+      </section>
+      <section class="copy-guide" aria-labelledby="copy-guide-title">
+        <h2 id="copy-guide-title">From ChatGPT to Telegram</h2>
+        <p>The plugin gives you an HTML code block with an <strong>Open HTML to Rich</strong> link underneath.</p>
+        <p>If ChatGPT offers a rendered preview, copy the <strong>formatted message</strong> from that preview and paste it into Telegram’s rich-text editor.</p>
+        <p>If the preview is unavailable or the formatting is lost, paste the <strong>HTML source</strong> into the converter here. Check the preview, choose <strong>Copy Rich Text</strong>, then paste into Telegram.</p>
+      </section>
+    </div>
+    <div class="info">
+      <section id="support" class="support" aria-labelledby="support-title" tabindex="-1">
+        <h2 id="support-title">Support</h2>
+        <p>For help, a privacy question or a deletion request, email steffko.</p>
+        <a class="contact" href="mailto:telegram.rich.text@gmail.com">telegram.rich.text@gmail.com</a>
+        <p class="secondary">For a formatting issue, tell me which editor you pasted into and which formatting changed. An anonymized example is enough.</p>
+      </section>
+      <section id="privacy" class="privacy" aria-labelledby="privacy-title" tabindex="-1">
+        <h2 id="privacy-title">Privacy</h2>
+        <p><strong>In ChatGPT.</strong> OpenAI processes your conversation according to your account settings. The plugin has no publisher-operated server that receives your drafts. You decide what to copy to Telegram. <a href="https://openai.com/policies/privacy-policy/">OpenAI privacy policy</a></p>
+        <p><strong>In the converter.</strong> Your pasted HTML stays in this tab’s memory. The converter has no accounts, analytics or draft uploads. Clearing the source clears the preview. Your browser and device manage any clipboard copies.</p>
+        <p><strong>Website hosting.</strong> GitHub Pages serves the site’s files and logs visitors’ IP addresses for security. The offline cache holds site files. It does not store your drafts. <a href="https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages#data-collection">GitHub Pages data collection</a></p>
+        <p><strong>Support email.</strong> Google processes support emails through Gmail. To respond, steffko uses your email address, message and any attachments you choose to send. Once your request is resolved, steffko deletes the support email thread. For privacy questions or deletion requests, <a href="mailto:telegram.rich.text@gmail.com">email steffko</a>. <a href="https://policies.google.com/privacy">Google privacy policy</a></p>
+      </section>
+    </div>
+  </main>
 </body>
 </html>
