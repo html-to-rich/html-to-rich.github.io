@@ -41,3 +41,11 @@ test('literal code preserves br and refuses structures that cannot be serialized
   assert.equal(prepareRichText('<pre><code>A<br>B<br></code></pre>').plainText, 'A\nB\n');
   assert.equal(prepareRichText('<pre><p>A</p><p>B</p></pre>').diagnostics[0].code, 'CODE_STRUCTURE');
 });
+
+test('HTML line-ending normalization is visible and preserves the code final newline', () => {
+  const result = prepareRichText('<pre><code>a\r\nb\r</code></pre>');
+  assert.equal(result.plainText, 'a\nb\n');
+  assert.equal(result.diagnostics[0].code, 'LINE_ENDINGS_NORMALIZED');
+  assert.equal(prepareRichText(result.html).plainText, result.plainText);
+  assert.equal(prepareRichText('<pre><code>x&#13;y</code></pre>').ok, false);
+});

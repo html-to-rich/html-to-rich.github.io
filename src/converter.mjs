@@ -246,6 +246,7 @@ export function prepareRichText(input) {
     const html = serialize(fragment).replace(/`{3,}/g, run => '&#96;'.repeat(run.length));
     if (encoder.encode(html).length > MAX_BYTES) reject('TOO_LARGE', 'The prepared representation exceeds the processing limit of 65,536 UTF-8 bytes.');
     const diagnostics = normalized.unwrapped ? [{code: 'FENCE_REMOVED', message: 'The matching outer code fence was removed.'}] : [];
+    if (input.includes('\r')) diagnostics.push({code: 'LINE_ENDINGS_NORMALIZED', message: 'HTML converts CR and CRLF line endings to LF, including inside code.'});
     return {...result, ok: true, html, plainText: plainText(fragment, visible + html), diagnostics, sanitizationChanged: html !== input};
   } catch (error) {
     if (!(error instanceof ProfileError)) throw error;

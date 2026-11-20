@@ -1,5 +1,5 @@
 const PREFIX = 'html-to-rich-';
-const CACHE = PREFIX + 'v5-shared-profile';
+const CACHE = PREFIX + 'v6-line-ending-diagnostic';
 const APP = ['/', '/index.html', '/app.css', '/app.js', '/converter-core.mjs', '/manifest.webmanifest', '/icon.png'];
 
 self.addEventListener('install', event => {
