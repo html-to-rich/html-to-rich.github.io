@@ -1,5 +1,5 @@
 const PREFIX = 'html-to-rich-';
-const CACHE = PREFIX + 'v3-publisher-home';
+const CACHE = PREFIX + 'v4-terms';
 const APP = ['/', '/index.html', '/app.css', '/app.js', '/manifest.webmanifest', '/icon.png'];
 
 self.addEventListener('install', event => {
